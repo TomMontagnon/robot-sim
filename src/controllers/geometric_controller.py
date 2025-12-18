@@ -4,10 +4,14 @@ from .abstract_controller import AbstractController
 
 class GeometricController(AbstractController):
     def __init__(
-        self, is_feedworwarded: bool, is_decoupled: bool, k_v: float, k_w: float
+        self,
+        k_v: float,
+        k_w: float,
+        is_feedworwarded: bool = True,
+        is_robot_framed: bool = True,
     ) -> None:
         self.is_feedforwarded = is_feedworwarded
-        self.is_decoupled = is_decoupled
+        self.is_robot_framed = is_robot_framed
         self.k_v = k_v
         self.k_w = k_w
 
@@ -24,7 +28,7 @@ class GeometricController(AbstractController):
         theta = x[2]
         etheta = thetad - theta
 
-        if self.is_decoupled:
+        if self.is_robot_framed:
             ex_robot = np.cos(theta) * dx + np.sin(theta) * dy
             ey_robot = -np.sin(theta) * dx + np.cos(theta) * dy
 

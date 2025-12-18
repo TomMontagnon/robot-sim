@@ -22,7 +22,7 @@ def main() -> None:
     adapter = UnicycleAdapter()
     traj = CircleTrajectory(R=100.0, omega=0.3)
     # traj = StraightTrajectory(1.0, [1,1])
-    controller = GeometricController(True, True, 1, 1)
+    controller = GeometricController(1, 1)
     sim = Simulator(robot, controller, adapter, traj, dt)
 
     # --- Simulation loop ---
