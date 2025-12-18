@@ -1,5 +1,5 @@
 import numpy as np
-from .abstract_traj import AbstractTrajectory
+from api.abstract_traj import AbstractTrajectory
 
 class StraightTrajectory(AbstractTrajectory):
     def __init__(self, v: float, direc: list) -> None:

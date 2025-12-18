@@ -1,14 +1,12 @@
 class Simulator:
-    def __init__(self, robot, controller, adapter, traj, dt=0.01):
+    def __init__(self, robot, controller, traj, dt=0.01):
         self.robot = robot
         self.controller = controller
-        self.adapter = adapter
         self.traj = traj
         self.dt = dt
 
     def step(self, x, t):
-        uc = self.controller.compute(x, self.traj, t)
-        u = self.adapter.map(uc)
+        u = self.controller.compute(x, self.traj, t)
         dx = self.robot.dynamics(x, u)
         return x + self.dt * dx
 

@@ -34,7 +34,7 @@ def animate(history, traj, dt):
     t_ref = np.linspace(0, dt * len(history), 500)
     xd, yd = [], []
     for t in t_ref:
-        x, y, _ = traj.evaluatePos(t)
+        x, y, _ = traj.evaluate_pos(t)
         xd.append(x)
         yd.append(y)
 
@@ -67,7 +67,7 @@ def animate(history, traj, dt):
 
         # Position idéale à cet instant
         t = frame * dt
-        x_ideal, y_ideal, _ = traj.evaluatePos(t)
+        x_ideal, y_ideal, _ = traj.evaluate_pos(t)
         ideal_point.set_data([x_ideal], [y_ideal])
 
         return traj_real, robot_patch, ideal_point
