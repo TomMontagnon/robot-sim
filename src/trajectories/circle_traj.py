@@ -1,12 +1,12 @@
 import numpy as np
+from .abstract_traj import AbstractTrajectory
 
-
-class CircleTrajectory:
-    def __init__(self, R=1.0, omega=0.2):
-        self.R = R
+class CircleTrajectory(AbstractTrajectory):
+    def __init__(self, radius : float =1.0, omega : float=0.2) -> None:
+        self.R = radius
         self.omega = omega
 
-    def evaluatePos(self, t):
+    def evaluate_pos(self, t : float) -> tuple:
         xd = self.R * np.cos(self.omega * t)
         yd = self.R * np.sin(self.omega * t)
 
@@ -14,7 +14,7 @@ class CircleTrajectory:
 
         return xd, yd, thetad
 
-    def evaluatePosVel(self, t):
+    def evaluate_pos_vel(self, t : float) -> tuple:
         xd, yd, thetad = self.evaluatePos(t)
 
         vd = self.R * self.omega
