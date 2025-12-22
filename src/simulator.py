@@ -1,12 +1,22 @@
+from api.abstract_robot_model import AbstractRobotState, AbstractRobotModel
+from api.abstract_controller import AbstractController
+from api.abstract_traj import AbstractTrajectory
+
+
 class Simulator:
-    def __init__(self, robot, controller, traj, dt=0.01):
-        self.robot = robot
-        self.controller = controller
+    def __init__(
+        self,
+        model: AbstractRobotModel,
+        controller: AbstractController,
+        traj: AbstractTrajectory,
+        dt: float = 0.01,
+    ) -> None:
+        self.model = model
+        self.controller  = controller
         self.traj = traj
         self.dt = dt
 
-    def step(self, x, t):
+    def step(self, x: AbstractRobotState, t: float) -> None:
         u = self.controller.compute(x, self.traj, t)
-        dx = self.robot.dynamics(x, u)
-        return x + self.dt * dx
-
+        dx = self.model.dynamics(x, u)
+        x.update(dx, self.dt)

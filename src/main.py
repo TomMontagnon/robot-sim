@@ -1,8 +1,10 @@
 import numpy as np
+from dataclasses import astuple
 
 # === Choix des briques ===
-from models.unicycle.model import UnicycleModel, adapt_to_unicycle
-from models.unicycle.controllers.lyapunov.kanayama_controller import KanayamaController
+from models.unicycle.model import UnicycleModel, UnicycleState, adapt_to_unicycle
+from models.unicycle.controllers.lyapunov.kanayama1990 import KanayamaController
+from models.unicycle.controllers.lyapunov.samson1990 import SamsonController
 from trajectories.circle_traj import CircleTrajectory
 from trajectories.straight_traj import StraightTrajectory
 from model_free_controllers.geometric_controller import GeometricController
@@ -16,25 +18,22 @@ def main() -> None:
     T = 20.0
 
     # --- Initial state (repère monde) ---
-    x0 = np.array([0.0, 0.0, 0.0])  # x, y, theta
+    x = UnicycleState(0, 0, 0)
+    t = 0.0
 
     # --- Instantiate blocks ---
     robot = UnicycleModel()
     traj = CircleTrajectory(radius=5.0, omega=0.3)
     # traj = StraightTrajectory(1.0, [1,1])
-    # controller = GeometricController(1, 1, adapt_to_unicycle)
-    controller = KanayamaController()
+    controller = GeometricController(1, 1, adapt_to_unicycle)
+    # controller = SamsonController()
     sim = Simulator(robot, controller, traj, dt)
-
-    # --- Simulation loop ---
-    x = x0.copy()
-    t = 0.0
 
     history = []
 
     while t < T:
-        history.append(x.copy())
-        x = sim.step(x, t)
+        history.append(np.array(astuple(x)))
+        sim.step(x, t)
         t += dt
 
     history = np.array(history)

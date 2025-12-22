@@ -4,7 +4,7 @@ from matplotlib.animation import FuncAnimation
 from api.abstract_traj import AbstractTrajectory
 
 
-def robot_shape(x : float, y : float, theta : float, L : float=0.3) -> np.ndarray:
+def robot_shape(x: float, y: float, theta: float, L: float = 0.3) -> np.ndarray:
     """
     Returns triangle vertices in world frame
     """
@@ -21,7 +21,7 @@ def robot_shape(x : float, y : float, theta : float, L : float=0.3) -> np.ndarra
     return P
 
 
-def animate(history : np.ndarray, traj : AbstractTrajectory, dt : float) -> None:
+def animate(history: np.ndarray, traj: AbstractTrajectory, dt: float) -> None:
     """
     history: Nx3 array of robot states
     traj: trajectory object (for reference plot)
@@ -58,7 +58,7 @@ def animate(history : np.ndarray, traj : AbstractTrajectory, dt : float) -> None
     ax.set_ylim(min(yd) - margin, max(yd) + margin)
 
     # --- Animation update ---
-    def update(frame : int) -> tuple:
+    def update(frame: int) -> tuple:
         x, y, theta = history[frame]
 
         traj_real.set_data(history[:frame, 0], history[:frame, 1])
@@ -73,6 +73,8 @@ def animate(history : np.ndarray, traj : AbstractTrajectory, dt : float) -> None
 
         return traj_real, robot_patch, ideal_point
 
-    _ani = FuncAnimation(fig, update, frames=len(history), interval=dt * 1000, blit=True)
+    _ani = FuncAnimation(
+        fig, update, frames=len(history), interval=dt * 1000, blit=True
+    )
 
     plt.show()

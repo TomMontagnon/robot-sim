@@ -14,9 +14,6 @@ class BicycleModel(AbstractRobotModel):
             [v * np.cos(theta), v * np.sin(theta), v / self.L * np.tan(delta)]
         )
 
-    def control_dim(self) -> int:
-        return 2
-
 def adapt_to_bicycle(v: float, w: float) -> np.ndarray:
     raise NotImplementedError
 

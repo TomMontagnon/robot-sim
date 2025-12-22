@@ -1,11 +1,21 @@
 from abc import ABC, abstractmethod
 
 
-class AbstractRobotModel(ABC):
+class AbstractRobotState(ABC):
     @abstractmethod
-    def dynamics(self, x, u) -> None:
+    def to_robot_frame(self) -> None:
         pass
 
     @abstractmethod
-    def control_dim(self) -> None:
+    def update(self) -> None:
+        pass
+
+
+class AbstractRobotCommand(ABC):
+    pass
+
+
+class AbstractRobotModel(ABC):
+    @abstractmethod
+    def dynamics(self, x: AbstractRobotState, u: AbstractRobotCommand) -> None:
         pass
