@@ -1,47 +1,18 @@
 from __future__ import annotations
 from api.abstract_robot_model import (
     AbstractRobotModel,
-    AbstractRobotState,
-    AbstractRobotCommand,
+    BasicRobotState,
+    BasicRobotCommand,
 )
-from dataclasses import dataclass
 import numpy as np
 
 
-@dataclass
-class UnicycleState(AbstractRobotState):
-    x: float
-    y: float
-    theta: float
+class UnicycleState(BasicRobotState):
+    pass
 
-    def to_robot_frame(self, x_r: float, y_r: float, theta_r: float) -> tuple:
-        to_robot_frame = np.array(
-            [
-                [np.cos(self.theta), np.sin(self.theta), 0],
-                [-np.sin(self.theta), np.cos(self.theta), 0],
-                [0, 0, 1],
-            ]
-        )
 
-        e_world = np.array(
-            [
-                x_r - self.x,
-                y_r - self.y,
-                theta_r - self.theta,
-            ]
-        )
-
-        return to_robot_frame @ e_world
-
-    def update(self, other : UnicycleState, dt : float) -> None:
-        self.x += other.x * dt
-        self.y += other.y * dt
-        self.theta += other.theta * dt
-
-@dataclass
-class UnicycleCommand(AbstractRobotCommand):
-    v: float
-    w: float
+class UnicycleCommand(BasicRobotCommand):
+    pass
 
 
 class UnicycleModel(AbstractRobotModel):

@@ -1,4 +1,4 @@
-from api.abstract_robot_model import AbstractRobotState, AbstractRobotModel
+from api.abstract_robot_model import BasicRobotState, AbstractRobotModel
 from api.abstract_controller import AbstractController
 from api.abstract_traj import AbstractTrajectory
 
@@ -16,7 +16,7 @@ class Simulator:
         self.traj = traj
         self.dt = dt
 
-    def step(self, x: AbstractRobotState, t: float) -> None:
+    def step(self, x: BasicRobotState, t: float) -> None:
         u = self.controller.compute(x, self.traj, t)
         dx = self.model.dynamics(x, u)
         x.update(dx, self.dt)

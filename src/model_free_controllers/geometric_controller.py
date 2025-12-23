@@ -2,8 +2,7 @@ import numpy as np
 from collections.abc import Callable
 from api.abstract_controller import AbstractController
 from api.abstract_traj import AbstractTrajectory
-from models.unicycle.model import UnicycleState, UnicycleCommand
-
+from api.abstract_robot_model import BasicRobotState, BasicRobotCommand
 
 class GeometricController(AbstractController):
     def __init__(
@@ -21,8 +20,8 @@ class GeometricController(AbstractController):
         self.output_adapter = output_adapter
 
     def compute(
-        self, x: UnicycleState, traj: AbstractTrajectory, t: float
-    ) -> UnicycleCommand:
+        self, x: BasicRobotState, traj: AbstractTrajectory, t: float
+    ) -> BasicRobotCommand:
         if self.is_feedforwarded:
             x_r, y_r, theta_r, v_r, w_r = traj.evaluate_pos_vel(t)
         else:

@@ -2,9 +2,14 @@ import numpy as np
 from dataclasses import astuple
 
 # === Choix des briques ===
-from models.unicycle.model import UnicycleModel, UnicycleState, adapt_to_unicycle
+from models.unicycle.model import (
+    UnicycleModel,
+    UnicycleVariantModel,
+    UnicycleState,
+    adapt_to_unicycle,
+)
 from models.unicycle.controllers.lyapunov.kanayama1990 import KanayamaController
-from models.unicycle.controllers.lyapunov.samson1990 import SamsonController
+from models.unicycle.controllers.lyapunov.m2_par import M2parController
 from trajectories.circle_traj import CircleTrajectory
 from trajectories.straight_traj import StraightTrajectory
 from model_free_controllers.geometric_controller import GeometricController
@@ -18,16 +23,22 @@ def main() -> None:
     T = 20.0
 
     # --- Initial state (repère monde) ---
-    x = UnicycleState(0, 0, 0)
+    x = UnicycleState(0, 0, np.pi / 2)
     t = 0.0
 
     # --- Instantiate blocks ---
-    robot = UnicycleModel()
     traj = CircleTrajectory(radius=5.0, omega=0.3)
-    # traj = StraightTrajectory(1.0, [1,1])
-    controller = GeometricController(1, 1, adapt_to_unicycle)
-    # controller = SamsonController()
-    sim = Simulator(robot, controller, traj, dt)
+
+    # =======================A CHOISIR==================================
+    # KANAYAMA DEMO
+    # model = UnicycleModel()
+    # controller = KanayamaController()
+
+    # M2 COURS DEMO
+    model = UnicycleVariantModel()
+    controller = M2parController()
+    # =======================================================
+    sim = Simulator(model, controller, traj, dt)
 
     history = []
 
