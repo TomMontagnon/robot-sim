@@ -10,8 +10,9 @@ class BasicRobotState:
     y: float
     theta: float
 
-
-    def to_robot_frame(self, x_r: float, y_r: float, theta_r: float) -> tuple:
+    def to_robot_frame(
+        self, x_r: float, y_r: float, theta_r: float, is_std: bool = True
+    ) -> tuple:
         to_robot_frame = np.array(
             [
                 [np.cos(self.theta), np.sin(self.theta), 0],
@@ -19,6 +20,8 @@ class BasicRobotState:
                 [0, 0, 1],
             ]
         )
+        if not is_std:
+            theta_r += np.pi/2
 
         e_world = np.array(
             [
@@ -27,6 +30,8 @@ class BasicRobotState:
                 theta_r - self.theta,
             ]
         )
+        if not is_std:
+            e_world*=-1
 
         return to_robot_frame @ e_world
 

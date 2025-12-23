@@ -17,7 +17,7 @@ class M2parController(AbstractController):
         # Trajectoire de référence
         x_r, y_r, theta_r, v_r, w_r = traj.evaluate_pos_vel(t)
 
-        e1, e2, e3 = x.to_robot_frame(x_r, y_r, theta_r)
+        e1, e2, e3 = x.to_robot_frame(x_r, y_r, theta_r, is_std=False)
 
         # Calcul de la loi de commande perpendiculaire
         m1 = -self.k2 * e2
@@ -26,4 +26,11 @@ class M2parController(AbstractController):
         v = v_r * np.cos(e3) - m1
         w = w_r - m2
 
+        # print("state :")
+        # print(x.x, x.y, x.theta)
+        # print("consigne")
+        # print(x_r, y_r, theta_r, v_r, w_r)
+        # print("sortie")
+        # print(v, w)
+        # input()
         return UnicycleCommand(v, w)

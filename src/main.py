@@ -23,7 +23,7 @@ def main() -> None:
     T = 20.0
 
     # --- Initial state (repère monde) ---
-    x = UnicycleState(0, 0, np.pi / 2)
+    x = UnicycleState(0, 0, 0)
     t = 0.0
 
     # --- Instantiate blocks ---
@@ -37,6 +37,11 @@ def main() -> None:
     # M2 COURS DEMO
     model = UnicycleVariantModel()
     controller = M2parController()
+
+    # GEOM DEMO
+    # model = UnicycleModel()
+    # controller = GeometricController(1,1, adapt_to_unicycle)
+
     # =======================================================
     sim = Simulator(model, controller, traj, dt)
 
@@ -48,6 +53,9 @@ def main() -> None:
         t += dt
 
     history = np.array(history)
+    # Realigner avec le vecteur vitesse si is_variant
+    if isinstance(model, UnicycleVariantModel):
+        history[:,2]-=np.pi/2
     print("Simulation finished")
     animate(history, traj, dt)
 
