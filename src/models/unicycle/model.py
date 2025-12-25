@@ -16,6 +16,8 @@ class UnicycleCommand(BasicRobotCommand):
 
 
 class UnicycleModel(AbstractRobotModel):
+    is_std = True
+
     def dynamics(self, x: UnicycleState, u: UnicycleCommand) -> UnicycleState:
         x_dot = u.v * np.cos(x.theta)
         y_dot = u.v * np.sin(x.theta)
@@ -23,8 +25,16 @@ class UnicycleModel(AbstractRobotModel):
 
         return UnicycleState(x_dot, y_dot, theta_dot)
 
+    def adapt_input(self, x: UnicycleState) -> UnicycleState:
+        return x
 
-class UnicycleVariantModel(AbstractRobotModel):
+    def adapt_output(self, v: float, w: float) -> UnicycleCommand:
+        return UnicycleCommand(v, w)
+
+
+class UnicycleM2Model(AbstractRobotModel):
+    is_std = False
+
     def dynamics(self, x: UnicycleState, u: UnicycleCommand) -> UnicycleState:
         x_dot = u.v * np.sin(x.theta)
         y_dot = -u.v * np.cos(x.theta)
@@ -32,6 +42,8 @@ class UnicycleVariantModel(AbstractRobotModel):
 
         return UnicycleState(x_dot, y_dot, theta_dot)
 
+    def adapt_input(self, x: UnicycleState) -> UnicycleState:
+        return UnicycleState(x.x, x.y, x.theta - np.pi/2)
 
-def adapt_to_unicycle(v: float, w: float) -> UnicycleCommand:
-    return UnicycleCommand(v, w)
+    def adapt_output(self, v: float, w: float) -> UnicycleCommand:
+        return UnicycleCommand(v, w)

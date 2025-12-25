@@ -9,6 +9,7 @@ class GeometricController(AbstractController):
         self,
         k_v: float,
         k_w: float,
+        input_adapter: Callable,
         output_adapter: Callable,
         is_feedworwarded: bool = True,
         is_robot_framed: bool = True,
@@ -17,15 +18,15 @@ class GeometricController(AbstractController):
         self.is_robot_framed = is_robot_framed
         self.k_v = k_v
         self.k_w = k_w
+        self.input_adapter = input_adapter
         self.output_adapter = output_adapter
 
     def compute(
-        self, x: BasicRobotState, traj: AbstractTrajectory, t: float
+        self, raw_x: BasicRobotState, traj: AbstractTrajectory, t: float
     ) -> BasicRobotCommand:
-        if self.is_feedforwarded:
-            x_r, y_r, theta_r, v_r, w_r = traj.evaluate_pos_vel(t)
-        else:
-            x_r, y_r, theta_r = traj.evaluate_pos(t)
+        x = self.input_adapter(raw_x)
+        x_r, y_r, theta_r, v_r, w_r = traj.evaluate(t)
+        if not self.is_feedforwarded:
             v_r, w_r = 0, 0
 
         dx = x_r - x.x

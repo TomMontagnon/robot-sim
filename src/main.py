@@ -4,9 +4,8 @@ from dataclasses import astuple
 # === Choix des briques ===
 from models.unicycle.model import (
     UnicycleModel,
-    UnicycleVariantModel,
+    UnicycleM2Model,
     UnicycleState,
-    adapt_to_unicycle,
 )
 from models.unicycle.controllers.lyapunov.kanayama1990 import KanayamaController
 from models.unicycle.controllers.lyapunov.m2_par import M2parController
@@ -17,32 +16,38 @@ from simulator import Simulator
 from visual_engine import animate
 
 
+M_FREE = UnicycleModel()
+
+
 def main() -> None:
     # --- Simulation parameters ---
     dt = 0.01
-    T = 20.0
+    T = 10
 
     # --- Initial state (repère monde) ---
     x = UnicycleState(0, 0, 0)
     t = 0.0
 
-    # --- Instantiate blocks ---
-    traj = CircleTrajectory(radius=5.0, omega=0.3)
-
-    # =======================A CHOISIR==================================
+    # =======================CONTROLLER TO CHOSE==================================
     # KANAYAMA DEMO
-    # model = UnicycleModel()
-    # controller = KanayamaController()
+    controller = KanayamaController()
 
     # M2 COURS DEMO
-    model = UnicycleVariantModel()
-    controller = M2parController()
+    # controller = M2parController()
 
     # GEOM DEMO
-    # model = UnicycleModel()
-    # controller = GeometricController(1,1, adapt_to_unicycle)
+    # controller = GeometricController(1, 1, M_FREE.adapt_input, M_FREE.adapt_output)
 
     # =======================================================
+
+    model = (
+        M_FREE if isinstance(controller, GeometricController) else controller.model()
+    )
+
+    # --- traj ---
+    condi = model.is_std or isinstance(controller, GeometricController)
+    traj = CircleTrajectory(radius=5.0, omega=0.3, is_std=condi)
+    # traj = StraightTrajectory(1,[0,-1], is_std=condi)
     sim = Simulator(model, controller, traj, dt)
 
     history = []
@@ -53,9 +58,9 @@ def main() -> None:
         t += dt
 
     history = np.array(history)
-    # Realigner avec le vecteur vitesse si is_variant
-    if isinstance(model, UnicycleVariantModel):
-        history[:,2]-=np.pi/2
+    # Realigner avec le vecteur vitesse si pas standard
+    if not model.is_std:
+        history[:, 2] -= np.pi / 2
     print("Simulation finished")
     animate(history, traj, dt)
 

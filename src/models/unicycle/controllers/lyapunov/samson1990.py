@@ -14,7 +14,7 @@ class SamsonController(AbstractController):
     def compute(
         self, x: UnicycleState, traj: AbstractTrajectory, t: float
     ) -> UnicycleCommand:
-        x_r, y_r, theta_r, v_r, w_r = traj.evaluate_pos_vel(t)
+        x_r, y_r, theta_r, v_r, w_r = traj.evaluate(t)
 
         ex, ey, etheta = x.to_robot_frame(x_r, y_r, theta_r)
 

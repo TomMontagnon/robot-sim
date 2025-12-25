@@ -1,20 +1,20 @@
 import numpy as np
-from api.abstract_controller import AbstractController, compatible_with
+from api.abstract_controller import AbstractController
 from api.abstract_traj import AbstractTrajectory
 from models.unicycle.model import UnicycleModel, UnicycleState, UnicycleCommand
 
 
-@compatible_with(UnicycleModel)
 class KanayamaController(AbstractController):
     def __init__(self, kx: float = 1.0, ky: float = 2.0, ktheta: float = 2.0) -> None:
         self.kx = kx
         self.ky = ky
         self.ktheta = ktheta
+        self.model = UnicycleModel
 
     def compute(
         self, x: UnicycleState, traj: AbstractTrajectory, t: float
     ) -> UnicycleCommand:
-        x_r, y_r, theta_r, v_r, w_r = traj.evaluate_pos_vel(t)
+        x_r, y_r, theta_r, v_r, w_r = traj.evaluate(t)
 
         ex, ey, etheta = x.to_robot_frame(x_r, y_r, theta_r)
 
