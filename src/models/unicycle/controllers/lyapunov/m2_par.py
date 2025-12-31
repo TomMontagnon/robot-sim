@@ -16,6 +16,8 @@ class M2parController(AbstractController):
     ) -> UnicycleCommand:
         # Trajectoire de référence
         x_r, y_r, theta_r, v_r, w_r = traj.evaluate(t)
+        # Parce que repere decalé
+        theta_r += np.pi / 2
 
         e1, e2, e3 = x.to_robot_frame(x_r, y_r, theta_r)
 

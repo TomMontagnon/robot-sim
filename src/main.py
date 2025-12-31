@@ -28,6 +28,10 @@ def main() -> None:
     x = UnicycleState(0, 0, 0)
     t = 0.0
 
+    # --- traj ---
+    traj = CircleTrajectory(radius=5.0, omega=0.3)
+    # traj = StraightTrajectory(1, [0, 1])
+
     # =======================CONTROLLER TO CHOSE==================================
     # KANAYAMA DEMO
     controller = KanayamaController()
@@ -43,11 +47,9 @@ def main() -> None:
     model = (
         M_FREE if isinstance(controller, GeometricController) else controller.model()
     )
+    if not model.is_std:
+        x.theta += np.pi / 2
 
-    # --- traj ---
-    condi = model.is_std or isinstance(controller, GeometricController)
-    traj = CircleTrajectory(radius=5.0, omega=0.3, is_std=condi)
-    # traj = StraightTrajectory(1,[0,-1], is_std=condi)
     sim = Simulator(model, controller, traj, dt)
 
     history = []

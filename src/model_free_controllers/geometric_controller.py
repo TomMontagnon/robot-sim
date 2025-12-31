@@ -4,6 +4,7 @@ from api.abstract_controller import AbstractController
 from api.abstract_traj import AbstractTrajectory
 from api.abstract_robot_model import BasicRobotState, BasicRobotCommand
 
+#Pour unicycle, equivalent à Linearized + Retour d'état
 class GeometricController(AbstractController):
     def __init__(
         self,
