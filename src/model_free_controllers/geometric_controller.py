@@ -51,3 +51,6 @@ class GeometricController(AbstractController):
         w = w_r + self.k_w * var_fb_w
 
         return self.output_adapter(v, w)  # commande canonique
+
+    def __str__(self) -> str:
+        return f"Geometric(kv:{self.k_v}, kw:{self.k_w}, forwarded:{self.is_feedforwarded}, rob_framed:{self.is_robot_framed})"

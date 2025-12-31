@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from api.abstract_traj import AbstractTrajectory
+import itertools
 
 
 def robot_shape(x: float, y: float, theta: float, L: float = 0.3) -> np.ndarray:
@@ -21,10 +22,9 @@ def robot_shape(x: float, y: float, theta: float, L: float = 0.3) -> np.ndarray:
     return P
 
 
-def animate(history: np.ndarray, traj: AbstractTrajectory, dt: float) -> None:
+def animate(history_dico: dict, traj: AbstractTrajectory, dt: float) -> None:
     """
-    history: Nx3 array of robot states
-    traj: trajectory object (for reference plot)
+    history_dico: {nom_robot: Nx3 numpy array}
     """
 
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -32,7 +32,7 @@ def animate(history: np.ndarray, traj: AbstractTrajectory, dt: float) -> None:
     ax.grid(True)
 
     # --- Plot desired trajectory (static) ---
-    t_ref = np.linspace(0, dt * len(history), 500)
+    t_ref = np.linspace(0, dt * max(len(h) for h in history_dico.values()), 500)
     xd, yd = [], []
     for t in t_ref:
         x, y, _, _, _ = traj.evaluate(t)
@@ -41,14 +41,34 @@ def animate(history: np.ndarray, traj: AbstractTrajectory, dt: float) -> None:
 
     ax.plot(xd, yd, "r--", label="Trajectoire désirée")
 
-    # --- Dynamic elements ---
-    (traj_real,) = ax.plot([], [], "b-", lw=2, label="Trajectoire réelle")
-    robot_patch = plt.Polygon([[0, 0], [0, 0], [0, 0]], color="b", alpha=0.7)
+    # =======================================================================================
+    #           Création des éléments graphiques pour CHAQUE robot
+    # =======================================================================================
 
-    ax.add_patch(robot_patch)
+    couleurs = itertools.cycle(plt.cm.tab20.colors)
 
-    # --- Ajouter point idéal rouge ---
-    (ideal_point,) = ax.plot([], [], "ro", label="Position idéale instantanée")
+    robots = {}  # stockage des éléments graphiques
+
+    for name, history in history_dico.items():
+        color = next(couleurs)
+
+        # courbe réelle
+        (traj_real,) = ax.plot([], [], "-", lw=2, color=color, label=f"{name}")
+
+        # robot patch
+        robot_patch = plt.Polygon([[0, 0], [0, 0], [0, 0]], color=color, alpha=0.6)
+        ax.add_patch(robot_patch)
+
+        # point idéal
+        (ideal_point,) = ax.plot([], [], "o", color=color, markersize=6)
+
+        robots[name] = {
+            "history": history,
+            "traj_real": traj_real,
+            "robot_patch": robot_patch,
+            "ideal_point": ideal_point,
+            "color": color,
+        }
 
     ax.legend()
 
@@ -57,24 +77,41 @@ def animate(history: np.ndarray, traj: AbstractTrajectory, dt: float) -> None:
     ax.set_xlim(min(xd) - margin, max(xd) + margin)
     ax.set_ylim(min(yd) - margin, max(yd) + margin)
 
-    # --- Animation update ---
-    def update(frame: int) -> tuple:
-        x, y, theta = history[frame]
+    # =======================================================================================
+    #                                FONCTION UPDATE
+    # =======================================================================================
 
-        traj_real.set_data(history[:frame, 0], history[:frame, 1])
+    max_frames = max(len(v["history"]) for v in robots.values())
 
-        P = robot_shape(x, y, theta)
-        robot_patch.set_xy(P)
+    def update(frame: int):
+        artists = []
 
-        # Position idéale à cet instant
-        t = frame * dt
-        x_ideal, y_ideal, _, _, _ = traj.evaluate(t)
-        ideal_point.set_data([x_ideal], [y_ideal])
+        for name, data in robots.items():
+            history = data["history"]
 
-        return traj_real, robot_patch, ideal_point
+            # éviter dépassement si history plus court
+            if frame < len(history):
+                x, y, theta = history[frame]
 
-    _ani = FuncAnimation(
-        fig, update, frames=len(history), interval=dt * 1000, blit=True
-    )
+                # tracer la trajectoire réelle
+                data["traj_real"].set_data(history[:frame, 0], history[:frame, 1])
+                artists.append(data["traj_real"])
 
+                # robot patch
+                P = robot_shape(x, y, theta)
+                data["robot_patch"].set_xy(P)
+                artists.append(data["robot_patch"])
+
+                # point idéal
+                t = frame * dt
+                x_ideal, y_ideal, _, _, _ = traj.evaluate(t)
+                data["ideal_point"].set_data([x_ideal], [y_ideal])
+                artists.append(data["ideal_point"])
+
+        return artists
+
+    # --- Animation ---
+    _ani = FuncAnimation(fig, update, frames=max_frames, interval=dt * 1000, blit=True)
+
+    plt.legend(loc="lower center", bbox_to_anchor=(0.5, 1.05))
     plt.show()

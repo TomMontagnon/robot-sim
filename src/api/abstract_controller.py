@@ -4,3 +4,6 @@ class AbstractController(ABC):
     @abstractmethod
     def compute() -> None:
         pass
+    @abstractmethod
+    def __str__() -> None:
+        pass
