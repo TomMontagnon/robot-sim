@@ -41,6 +41,10 @@ def animate(history_dico: dict, traj: AbstractTrajectory, dt: float) -> None:
 
     ax.plot(xd, yd, "r--", label="Trajectoire désirée")
 
+    # --- Point idéal global (rouge) ---
+    (ideal_point,) = ax.plot(
+        [], [], "o", color="red", markersize=6, label="Point idéal"
+    )
     # =======================================================================================
     #           Création des éléments graphiques pour CHAQUE robot
     # =======================================================================================
@@ -59,14 +63,10 @@ def animate(history_dico: dict, traj: AbstractTrajectory, dt: float) -> None:
         robot_patch = plt.Polygon([[0, 0], [0, 0], [0, 0]], color=color, alpha=0.6)
         ax.add_patch(robot_patch)
 
-        # point idéal
-        (ideal_point,) = ax.plot([], [], "o", color=color, markersize=6)
-
         robots[name] = {
             "history": history,
             "traj_real": traj_real,
             "robot_patch": robot_patch,
-            "ideal_point": ideal_point,
             "color": color,
         }
 
@@ -105,8 +105,8 @@ def animate(history_dico: dict, traj: AbstractTrajectory, dt: float) -> None:
                 # point idéal
                 t = frame * dt
                 x_ideal, y_ideal, _, _, _ = traj.evaluate(t)
-                data["ideal_point"].set_data([x_ideal], [y_ideal])
-                artists.append(data["ideal_point"])
+                ideal_point.set_data([x_ideal], [y_ideal])
+                artists.append(ideal_point)
 
         return artists
 
@@ -114,4 +114,5 @@ def animate(history_dico: dict, traj: AbstractTrajectory, dt: float) -> None:
     _ani = FuncAnimation(fig, update, frames=max_frames, interval=dt * 1000, blit=True)
 
     plt.legend(loc="lower center", bbox_to_anchor=(0.5, 1.05))
+    plt.tight_layout()
     plt.show()

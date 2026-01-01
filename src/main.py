@@ -13,6 +13,7 @@ from models.unicycle.controllers.lyapunov.samson1990 import SamsonController
 from models.unicycle.controllers.lyapunov.m2_par import M2parController
 from trajectories.circle_traj import CircleTrajectory
 from trajectories.straight_traj import StraightTrajectory
+from trajectories.composite_traj import CompositeTrajectory
 from model_free_controllers.geometric_controller import GeometricController
 from simulator import Simulator
 from visual_engine import animate
@@ -24,15 +25,21 @@ M_FREE = UnicycleModel()
 def main() -> None:
     # --- Simulation parameters ---
     dt = 0.01
-    T = 10
+    T = 20
 
     # --- Initial state (repère monde) ---
     x_ini = UnicycleState(0, 0, 0)
     t_ini = 0.0
 
     # --- traj ---
-    traj = CircleTrajectory(radius=5.0, omega=0.3)
+    # traj = CircleTrajectory(radius=5.0, omega=0.3)
     # traj = StraightTrajectory(1, [0, 1])
+    traj = CompositeTrajectory()
+
+    traj.add_fragment(StraightTrajectory(speed=1, direc=[0, 1]), duration=5)
+    traj.add_fragment(CircleTrajectory(radius=3, omega=-0.5, angle_offset=np.pi), duration=np.pi/0.5)
+    traj.add_fragment(CircleTrajectory(radius=3, omega=0.5, angle_offset=np.pi), duration=np.pi/0.5)
+    traj.add_fragment(StraightTrajectory(speed=1, direc=[0, 1]), duration=5)
 
     # --- controllers ---
     controllers = [
